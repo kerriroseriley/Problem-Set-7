@@ -1,6 +1,50 @@
 ---
 title: "Problem Set 7"
 author: "Kerri Rose Riley"
-format: html
+format:
+  html: default
+  pdf: default
 ---
 
+## 1. Replicate both parts of Figure 1 for Bartel
+```{r}
+
+```
+
+## 2. Extend Analysis to include recent years
+```{r}
+
+```
+
+## 3.Extend the analysis to 2024, using the 2024 ANES file. (This will require using the 2024 file in conjunction with the cumulative file.)
+```{r}
+
+```
+
+
+## 4. Create figure that include midterm election years as well
+```{r}
+
+```
+
+
+## 5. Original Work
+
+```{r}
+
+```
+
+## 6. Bonus - Replicate Figure 2 from Bartels; add in recent years and 2024
+```{r}
+
+```
+
+
+## Follow-up Questions
+Where did you encounter problems with this replication? Was there anything that was particularly tricky?
+
+How would you interpret (explain) what Bartels found in figures 1 & 2?
+
+Has anything changed since 1996 that would alter the substantive takeaway points in their findings?
+
+Does anything change about the analysis in a substantive way when you include midterm election years?
