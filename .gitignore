@@ -47,3 +47,5 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+Data/anes_2024.dta
+Data/anes_cum.dta
