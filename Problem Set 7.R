@@ -1,29 +1,27 @@
 # Topic: Distribution of Party Identification
 #Author: Kerri Rose Riley
+# Purpose: Replicate figure 1 from Bartels(2000)-"Partisanship and Voting Behavior, 1952-1996"
+# Requires: Cumulative American National Election Studies (ANES) file 
+# Output: Figures as PDF (ggplot only)
+
 
 # Import modules
-# For data wrangling
-library(tidyverse)
-
-# To use read_dta() for Stata files
-library(haven)
-
-# For graphs and plots
-library(ggplot2)
-
+library(tidyverse) # For data wrangling
+library(haven) # To use read_dta() for Stata files
+library(ggplot2) # For graphs and plots
 
 # Read the ANES data
-
 anes_2024 <- read_dta("~/Desktop/Current Classes/R/Problem Set 7/Data/anes_2024.dta")
 
 # Read the cumulative ANES data
 anes_cum <- read_dta("~/Desktop/Current Classes/R/Problem Set 7/Data/anes_cum.dta")
 
 
-# Recode partid
 
 # Recode VCF0305 into four party identification categories
-figure1_cum <- anes_cum |>
+
+figure1 <- anes_cum |>
+  filter(VCF0004 >= 1952 & VCF0004 <= 1996) |>
   mutate(
     party_id = case_when(
       VCF0305 == 1 ~ "Pure Independents",
@@ -35,115 +33,67 @@ figure1_cum <- anes_cum |>
   ) |>
   filter(!is.na(party_id))
 
-
-# Calculate proportions of each year
-figure1_cum <- anes_cum |>
-  mutate(
-    party_id = case_when(
-      VCF0305 == 1 ~ "Pure Independents",
-      VCF0305 == 2 ~ "Independent Leaners",
-      VCF0305 == 3 ~ "Weak Identifiers",
-      VCF0305 == 4 ~ "Strong Identifiers",
-      TRUE ~ NA_character_
-    )
-  ) |>
-  filter(!is.na(party_id))
+# Calculate proportions
+figure1 <- figure1 |>
+  group_by(VCF0004, party_id) |>
+  summarize(n = n(), .groups = "drop") |>
+  group_by(VCF0004) |>
+  mutate(proportion = n / sum(n)) |>
+  ungroup()
 
 
-# Original Bartels figure: 1952-1996
-
-figure1_cum <- anes_cum |>
-  mutate(
-    party_id = case_when(
-      VCF0305 == 1 ~ "Pure Independents",
-      VCF0305 == 2 ~ "Independent Leaners",
-      VCF0305 == 3 ~ "Weak Identifiers",
-      VCF0305 == 4 ~ "Strong Identifiers",
-      TRUE ~ NA_character_
-    )
-  ) |>
-  filter(!is.na(party_id))
-
-
-figure1_cum <- anes_cum |>
-  mutate(
-    party_id = case_when(
-      VCF0305 == 1 ~ "Pure Independents",
-      VCF0305 == 2 ~ "Independent Leaners",
-      VCF0305 == 3 ~ "Weak Identifiers",
-      VCF0305 == 4 ~ "Strong Identifiers",
-      TRUE ~ NA_character_
-    )
-  ) |>
-  filter(!is.na(party_id))
-
-# Extend analysis through 2020
-# This includes midterm elections
-
-figure1_cum <- anes_cum |>
-  mutate(
-    party_id = case_when(
-      VCF0305 == 1 ~ "Pure Independents",
-      VCF0305 == 2 ~ "Independent Leaners",
-      VCF0305 == 3 ~ "Weak Identifiers",
-      VCF0305 == 4 ~ "Strong Identifiers",
-      TRUE ~ NA_character_
-    )
-  ) |>
-  filter(!is.na(party_id))
-
-
-# Add 2024 data
-figure1_cum <- anes_cum |>
-  mutate(
-    party_id = case_when(
-      VCF0305 == 1 ~ "Pure Independents",
-      VCF0305 == 2 ~ "Independent Leaners",
-      VCF0305 == 3 ~ "Weak Identifiers",
-      VCF0305 == 4 ~ "Strong Identifiers",
-      TRUE ~ NA_character_
-    )
-  ) |>
-  filter(!is.na(party_id))
-
-
-figure1_extended <- bind_rows(
-  figure1_recent,
-  figure1_2024
-) |>
+figure1 <- figure1 |>
   mutate(
     panel = case_when(
-      party_id %in% c(
-        "Strong Identifiers",
-        "Weak Identifiers"
-      ) ~ "Party Identifiers",
-      
-      party_id %in% c(
-        "Independent Leaners",
-        "Pure Independents"
-      ) ~ "Independents"
+      party_id %in% c("Strong Identifiers", "Weak Identifiers") ~ "Identifiers",
+      party_id %in% c("Independent Leaners", "Pure Independents") ~ "Independents"
     )
   )
 
-# Create figure showing extended figure 1
-
-figure1_extended <- bind_rows(
-  figure1_recent,
-  figure1_2024
-) |>
-  mutate(
-    panel = case_when(
-      party_id %in% c(
-        "Strong Identifiers",
-        "Weak Identifiers"
-      ) ~ "Party Identifiers",
-      
-      party_id %in% c(
-        "Independent Leaners",
-        "Pure Independents"
-      ) ~ "Independents"
+ggplot(figure1, aes(
+  x = VCF0004,
+  y = proportion,
+  group = party_id,
+  linetype = party_id,
+  shape = party_id
+)) +
+  geom_line() +
+  geom_point(size = 2) +
+  facet_grid(panel ~ ., scales = "fixed") +
+  scale_y_continuous(
+    limits = c(0, 0.5),
+    breaks = seq(0.1, 0.5, 0.1)
+  ) +
+  scale_x_continuous(
+    breaks = c(1956, 1964, 1972, 1980, 1988, 1996)
+  ) +
+  scale_linetype_manual(
+    values = c(
+      "Strong Identifiers" = "solid",
+      "Weak Identifiers" = "dashed",
+      "Independent Leaners" = "dashed",
+      "Pure Independents" = "solid"
     )
+  ) +
+  scale_shape_manual(
+    values = c(
+      "Strong Identifiers" = 16,
+      "Weak Identifiers" = 1,
+      "Independent Leaners" = 1,
+      "Pure Independents" = 16
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = "Proportions of National Election Study Sample"
+  ) +
+  theme_classic() +
+  theme(
+    legend.position = "bottom",
+    strip.background = element_blank(),
+    strip.text = element_blank()
   )
+
 
 # Original Work -  Find two interesting variables and create compelling univariate graphs to illustrate their central tendency, distribution, and spread.
 
