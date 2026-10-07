@@ -121,7 +121,14 @@ ggplot(figure1, aes(
     )
   )
 
-# Extend analysis to have extended years
+# Extend analysis to have extended years (2020)
+
+
+
+
+
+
+
 
 # Extend analysis through 2024
 
