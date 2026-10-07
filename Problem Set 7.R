@@ -17,7 +17,6 @@ anes_2024 <- read_dta("~/Desktop/Current Classes/R/Problem Set 7/Data/anes_2024.
 anes_cum <- read_dta("~/Desktop/Current Classes/R/Problem Set 7/Data/anes_cum.dta")
 
 
-
 # Recode VCF0305 into four party identification categories
 
 figure1 <- anes_cum |>
@@ -51,6 +50,8 @@ figure1 <- figure1 |>
     )
   )
 
+
+# PLOTTING
 ggplot(figure1, aes(
   x = VCF0004,
   y = proportion,
@@ -58,16 +59,29 @@ ggplot(figure1, aes(
   linetype = party_id,
   shape = party_id
 )) +
+  # Lines connect all years
   geom_line() +
-  geom_point(size = 2) +
+  
+  # Points only at labeled years
+  geom_point(
+    data = filter(
+      figure1,
+      VCF0004 %% 4 == 0
+    ),
+    size = 2
+  ) +
+  
   facet_grid(panel ~ ., scales = "fixed") +
+  
   scale_y_continuous(
     limits = c(0, 0.5),
     breaks = seq(0.1, 0.5, 0.1)
   ) +
+  
   scale_x_continuous(
     breaks = c(1956, 1964, 1972, 1980, 1988, 1996)
   ) +
+  
   scale_linetype_manual(
     values = c(
       "Strong Identifiers" = "solid",
@@ -76,6 +90,7 @@ ggplot(figure1, aes(
       "Pure Independents" = "solid"
     )
   ) +
+  
   scale_shape_manual(
     values = c(
       "Strong Identifiers" = 16,
@@ -84,17 +99,27 @@ ggplot(figure1, aes(
       "Pure Independents" = 16
     )
   ) +
+  
   labs(
     x = NULL,
-    y = "Proportions of National Election Study Sample"
+    y = NULL,
+    title = "Proportions of National Election Study Sample"
   ) +
+  
   theme_classic() +
+  
   theme(
     legend.position = "bottom",
     strip.background = element_blank(),
-    strip.text = element_blank()
+    strip.text = element_blank(),
+    panel.border = element_rect(
+      color = "black",
+      fill = NA
+    ),
+    plot.title = element_text(
+      hjust = 0.5
+    )
   )
-
 
 # Extend analysis to have extended years
 
@@ -148,8 +173,7 @@ ggplot(figure1_extended, aes(
     breaks = seq(0.1, 0.5, 0.1)
   ) +
   scale_x_continuous(
-    breaks = c(1956, 1964, 1972, 1980, 1988, 1996,
-               2004, 2008, 2012, 2016, 2020, 2024)
+    breaks = seq(1956, 2024, 4)
   ) +
   scale_linetype_manual(
     values = c(
@@ -169,13 +193,18 @@ ggplot(figure1_extended, aes(
   ) +
   labs(
     x = NULL,
-    y = "Proportions of National Election Study Sample"
+    y = NULL,
+    title = "Proportions of National Election Study Sample"
   ) +
   theme_classic() +
   theme(
     legend.position = "bottom",
     strip.background = element_blank(),
-    strip.text = element_blank()
+    strip.text = element_blank(),
+    panel.border = element_rect(
+      color = "black",
+      fill = NA
+    )
   )
 
 
@@ -207,23 +236,55 @@ figure1_midterms <- anes_all |>
     )
   )
 
-ggplot(figure1_midterms, aes(
-  x = VCF0004,
-  y = proportion,
-  group = party_id,
-  linetype = party_id,
-  shape = party_id
-)) +
+
+# Plot extended figure
+ggplot(
+  figure1_extended,
+  aes(
+    x = VCF0004,
+    y = proportion,
+    group = party_id,
+    linetype = party_id,
+    shape = party_id
+  )
+) +
+  
+  # Lines connect all years
   geom_line() +
-  geom_point(size = 2) +
-  facet_grid(panel ~ ., scales = "fixed") +
+  
+  # Points only at x-axis tick marks
+  geom_point(
+    data = filter(
+      figure1_extended,
+      VCF0004 %in% c(
+        1956, 1964, 1972, 1980, 1988, 1996,
+        2004, 2008, 2012, 2016, 2020, 2024
+      )
+    ),
+    size = 2
+  ) +
+  
+  # Create two panels
+  facet_grid(
+    panel ~ .,
+    scales = "fixed"
+  ) +
+  
+  # Y-axis
   scale_y_continuous(
     limits = c(0, 0.5),
     breaks = seq(0.1, 0.5, 0.1)
   ) +
+  
+  # X-axis
   scale_x_continuous(
-    breaks = seq(1952, 2024, 4)
+    breaks = c(
+      1956, 1964, 1972, 1980, 1988, 1996,
+      2004, 2008, 2012, 2016, 2020, 2024
+    )
   ) +
+  
+  # Line types
   scale_linetype_manual(
     values = c(
       "Strong Identifiers" = "solid",
@@ -232,6 +293,8 @@ ggplot(figure1_midterms, aes(
       "Pure Independents" = "solid"
     )
   ) +
+  
+  # Point shapes
   scale_shape_manual(
     values = c(
       "Strong Identifiers" = 16,
@@ -240,15 +303,32 @@ ggplot(figure1_midterms, aes(
       "Pure Independents" = 16
     )
   ) +
+  
+  # Labels
   labs(
     x = NULL,
-    y = "Proportions of National Election Study Sample"
+    y = NULL,
+    title = "Proportions of National Election Study Sample"
   ) +
+  
+  # Theme
   theme_classic() +
+  
   theme(
     legend.position = "bottom",
     strip.background = element_blank(),
-    strip.text = element_blank()
+    strip.text = element_blank(),
+    
+    # Border around each panel
+    panel.border = element_rect(
+      color = "black",
+      fill = NA
+    ),
+    
+    # Center title
+    plot.title = element_text(
+      hjust = 0.5
+    )
   )
 
 
