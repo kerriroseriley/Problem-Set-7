@@ -123,12 +123,34 @@ ggplot(figure1, aes(
 
 # Extend analysis to have extended years
 
-# stacks data frames on top of each other
-anes_all <- bind_rows(anes_cum, anes_2024)
+# Extend analysis through 2024
 
-# Recode VCF0305 into four party identification categories
-figure1_extended <- anes_all |>
-  filter(VCF0004 >= 1952 & VCF0004 <= 2024) |>
+# Create the same four party identification categories
+# for the 2024 ANES data
+
+anes_2024 <- anes_2024 |>
+  mutate(
+    VCF0004 = 2024,
+    party_id = case_when(
+      
+      # Pure Independents
+      V241221 == 3 & V241223 == 2 ~ "Pure Independents",
+      
+      # Independent Leaners
+      V241221 == 3 & V241223 %in% c(1, 3) ~ "Independent Leaners",
+      
+      # Strong Identifiers
+      V241221 %in% c(1, 2) & V241222 == 1 ~ "Strong Identifiers",
+      
+      # Weak Identifiers
+      V241221 %in% c(1, 2) & V241222 == 2 ~ "Weak Identifiers",
+      
+      TRUE ~ NA_character_
+    )
+  )
+
+# Create the same party_id variable for the cumulative data
+anes_cum_extended <- anes_cum |>
   mutate(
     party_id = case_when(
       VCF0305 == 1 ~ "Pure Independents",
@@ -137,34 +159,53 @@ figure1_extended <- anes_all |>
       VCF0305 == 4 ~ "Strong Identifiers",
       TRUE ~ NA_character_
     )
-  ) |>
-  filter(!is.na(party_id))
+  )
+
+# Combine cumulative ANES and 2024 ANES
+anes_all <- bind_rows(
+  anes_cum_extended,
+  anes_2024
+)
 
 # Calculate proportions
-figure1_extended <- figure1_extended |>
+figure1_extended <- anes_all |>
+  filter(VCF0004 >= 1952 & VCF0004 <= 2024) |>
+  filter(!is.na(party_id)) |>
   group_by(VCF0004, party_id) |>
-  summarize(n = n(), .groups = "drop") |>
+  summarize(
+    n = n(),
+    .groups = "drop"
+  ) |>
   group_by(VCF0004) |>
-  mutate(proportion = n / sum(n)) |>
-  ungroup()
-
-# Create panels
-figure1_extended <- figure1_extended |>
+  mutate(
+    proportion = n / sum(n)
+  ) |>
+  ungroup() |>
   mutate(
     panel = case_when(
-      party_id %in% c("Strong Identifiers", "Weak Identifiers") ~ "Identifiers",
-      party_id %in% c("Independent Leaners", "Pure Independents") ~ "Independents"
+      party_id %in% c(
+        "Strong Identifiers",
+        "Weak Identifiers"
+      ) ~ "Identifiers",
+      
+      party_id %in% c(
+        "Independent Leaners",
+        "Pure Independents"
+      ) ~ "Independents"
     )
   )
 
 # Plot extended figure
-ggplot(figure1_extended, aes(
-  x = VCF0004,
-  y = proportion,
-  group = party_id,
-  linetype = party_id,
-  shape = party_id
-)) +
+ggplot(
+  figure1_extended,
+  aes(
+    x = VCF0004,
+    y = proportion,
+    group = party_id,
+    linetype = party_id,
+    shape = party_id
+  )
+) +
   geom_line() +
   geom_point(size = 2) +
   facet_grid(panel ~ ., scales = "fixed") +
@@ -204,6 +245,9 @@ ggplot(figure1_extended, aes(
     panel.border = element_rect(
       color = "black",
       fill = NA
+    ),
+    plot.title = element_text(
+      hjust = 0.5
     )
   )
 
