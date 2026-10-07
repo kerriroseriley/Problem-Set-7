@@ -179,5 +179,84 @@ ggplot(
 
 
 
+# 3: Extend to 2024 using anes_2024
+
+figure1_2024 <- anes_2024 |>
+  mutate(
+    party_id = case_when(
+      V241227x %in% c(1, 7) ~ "Strong Identifiers",
+      V241227x %in% c(2, 6) ~ "Weak Identifiers",
+      V241227x %in% c(3, 5) ~ "Independent Leaners",
+      V241227x == 4 ~ "Pure Independents",
+      TRUE ~ NA_character_
+    ),
+    year = 2024
+  ) |>
+  filter(!is.na(party_id)) |>
+  group_by(year, party_id) |>
+  summarize(n = n(), .groups = "drop") |>
+  group_by(year) |>
+  mutate(proportion = n / sum(n)) |>
+  ungroup()
+
+figure1_extended <- bind_rows(
+  figure1_recent |>
+    rename(year = VCF0004),
+  figure1_2024
+) |>
+  mutate(
+    panel = case_when(
+      party_id %in% c("Strong Identifiers", "Weak Identifiers") ~
+        "Party Identifiers",
+      party_id %in% c("Independent Leaners", "Pure Independents") ~
+        "Independents"
+    )
+  )
+
+ggplot(
+  figure1_extended,
+  aes(
+    x = year,
+    y = proportion,
+    group = party_id,
+    linetype = party_id,
+    shape = party_id
+  )
+) +
+  geom_line() +
+  geom_point() +
+  facet_grid(panel ~ .) +
+  scale_y_continuous(
+    limits = c(0, 0.5),
+    breaks = seq(0.1, 0.5, 0.1)
+  ) +
+  scale_linetype_manual(
+    values = c(
+      "Strong Identifiers" = "solid",
+      "Weak Identifiers" = "dashed",
+      "Independent Leaners" = "dashed",
+      "Pure Independents" = "solid"
+    )
+  ) +
+  scale_shape_manual(
+    values = c(
+      "Strong Identifiers" = 16,
+      "Weak Identifiers" = 1,
+      "Independent Leaners" = 1,
+      "Pure Independents" = 16
+    )
+  ) +
+  labs(
+    x = "Year",
+    y = "Proportions of National Election Study Sample"
+  ) +
+  theme_classic()
+
+
+# Include midterm years
+
+
+
+
 
 
