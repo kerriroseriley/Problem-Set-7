@@ -10,7 +10,7 @@ format:
 ```{r}
 # Import modules
 library(tidyverse) # For data wrangling
-library(haven) # To use read_dta() for Stata files
+library(haven) # To use read_dta() for Data files
 library(ggplot2) # For graphs and plots
 
 # Read the ANES data
@@ -259,9 +259,8 @@ ggplot(
 ## 4. Create figure that include midterm election years as well
 ```{r}
 # Create figure including presidential and midterm election years
+# Use the cumulative ANES data
 
-# Create figure using the cumulative ANES data
-# through 2020, including presidential and midterm election years
  
 figure1_midterms <- anes_cum |>
   filter(VCF0004 >= 1952 & VCF0004 <= 2020) |>
