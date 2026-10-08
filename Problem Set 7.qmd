@@ -373,6 +373,7 @@ ggplot(
 ## 5. Original Work
 
 ```{r} 
+# Original Work
 political_info <- anes_cum |>
   mutate(
     political_info = case_when(
