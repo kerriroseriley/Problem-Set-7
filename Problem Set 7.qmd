@@ -244,7 +244,7 @@ ggplot(
     y = NULL,
     title = "Proportions of National Election Study Sample"
   ) +
-  theme_classic() +
+  theme_classic() + 
   theme(
     legend.position = "bottom",
     strip.background = element_blank(),
