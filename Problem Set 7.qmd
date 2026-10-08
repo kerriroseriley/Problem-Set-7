@@ -266,7 +266,7 @@ ggplot(
 
 # Create figure using the cumulative ANES data
 # through 2020, including presidential and midterm election years
-
+ 
 figure1_midterms <- anes_cum |>
   filter(VCF0004 >= 1952 & VCF0004 <= 2020) |>
   mutate(
