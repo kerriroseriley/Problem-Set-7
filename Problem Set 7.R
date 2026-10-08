@@ -1,5 +1,5 @@
 # Topic: Distribution of Party Identification
-#Author: Kerri Rose Riley
+# Author: Kerri Rose Riley
 # Purpose: Replicate figure 1 from Bartels(2000)-"Partisanship and Voting Behavior, 1952-1996"
 # Requires: Cumulative American National Election Studies (ANES) file 
 # Output: Figures as PDF (ggplot only)
@@ -261,10 +261,12 @@ ggplot(
 
 
 # Midterms
-# Create figure including presidential and midterm election years
 
-figure1_midterms <- anes_all |>
-  filter(VCF0004 >= 1952 & VCF0004 <= 2024) |>
+#  using the cumulative ANES data
+# through 2020, including presidential and midterm election years
+
+figure1_midterms <- anes_cum |>
+  filter(VCF0004 >= 1952 & VCF0004 <= 2020) |>
   mutate(
     party_id = case_when(
       VCF0305 == 1 ~ "Pure Independents",
@@ -287,10 +289,9 @@ figure1_midterms <- anes_all |>
     )
   )
 
-
-# Plot extended figure
+# Plot
 ggplot(
-  figure1_extended,
+  figure1_midterms,
   aes(
     x = VCF0004,
     y = proportion,
@@ -300,20 +301,11 @@ ggplot(
   )
 ) +
   
-  # Lines connect all years
+  # Lines connect all available ANES years
   geom_line() +
   
-  # Points only at x-axis tick marks
-  geom_point(
-    data = filter(
-      figure1_extended,
-      VCF0004 %in% c(
-        1956, 1964, 1972, 1980, 1988, 1996,
-        2004, 2008, 2012, 2016, 2020, 2024
-      )
-    ),
-    size = 2
-  ) +
+  # Points show all available ANES years, including midterms
+  geom_point(size = 2) +
   
   # Create two panels
   facet_grid(
@@ -329,10 +321,7 @@ ggplot(
   
   # X-axis
   scale_x_continuous(
-    breaks = c(
-      1956, 1964, 1972, 1980, 1988, 1996,
-      2004, 2008, 2012, 2016, 2020, 2024
-    )
+    breaks = seq(1952, 2020, 4)
   ) +
   
   # Line types
