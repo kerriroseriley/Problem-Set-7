@@ -5,8 +5,6 @@ format: pdf
 ---
 ## 1. Replicate both parts of Figure 1 for Bartel
 ```{r}
-
-
 # Import modules
 library(tidyverse) # Load the tidyverse package for data wrangling and analysis
 library(haven) # Load haven so read_dta() can be used to import Stata data files
@@ -570,5 +568,3 @@ ggplot(republican_ideology, aes(x = republican_ideology)) +
 ###Does anything change about the analysis in a substantive way when you include midterm election years?
 
 #### Midterm years add extra data points and short-term noise, but they do not alter the main story. Midterm years just reflect lower voter turnout, which creates temporary bumps because midterm voters are slightly more partisan. Whether you look at midterms or not, the main idea is identical, with a big drop in party loyalty in the 1960s-1970s, followed by a huge comeback in party loyalty after 1996.
-
-
