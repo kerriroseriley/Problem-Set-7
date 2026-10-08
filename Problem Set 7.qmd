@@ -125,12 +125,8 @@ ggplot(figure1, aes(
   )
 ```
 
-## 2. Extend Analysis to include recent years
-```{r}
 
-```
-
-## 3.Extend the analysis to 2024, using the 2024 ANES file. (This will require using the 2024 file in conjunction with the cumulative file.)
+## 3. Extend the analysis to 2024, using the 2024 ANES file. (This will require using the 2024 file in conjunction with the cumulative file.)
 ```{r}
 # Create the same four party identification categories
 # for the 2024 ANES data
@@ -202,7 +198,6 @@ figure1_extended <- anes_all |>
     )
   )
 
-# Plot extended figure
 ggplot(
   figure1_extended,
   aes(
@@ -214,14 +209,17 @@ ggplot(
   )
 ) +
   geom_line() +
-  geom_point(size = 2) +
+  geom_point(
+    data = filter(figure1_extended, VCF0004 %% 4 == 0),
+    size = 2
+  ) +
   facet_grid(panel ~ ., scales = "fixed") +
   scale_y_continuous(
     limits = c(0, 0.5),
     breaks = seq(0.1, 0.5, 0.1)
   ) +
   scale_x_continuous(
-    breaks = seq(1956, 2024, 4)
+    breaks = seq(1952, 2024, 8)
   ) +
   scale_linetype_manual(
     values = c(
@@ -244,7 +242,7 @@ ggplot(
     y = NULL,
     title = "Proportions of National Election Study Sample"
   ) +
-  theme_classic() + 
+  theme_classic() +
   theme(
     legend.position = "bottom",
     strip.background = element_blank(),
@@ -253,9 +251,7 @@ ggplot(
       color = "black",
       fill = NA
     ),
-    plot.title = element_text(
-      hjust = 0.5
-    )
+    plot.title = element_text(hjust = 0.5)
   )
 ```
 

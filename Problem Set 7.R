@@ -121,17 +121,10 @@ ggplot(figure1, aes(
     )
   )
 
-# Extend analysis to have extended years (2020)
-
-
-
-
-
 
 
 
 # Extend analysis through 2024
-
 # Create the same four party identification categories
 # for the 2024 ANES data
 
@@ -202,7 +195,6 @@ figure1_extended <- anes_all |>
     )
   )
 
-# Plot extended figure
 ggplot(
   figure1_extended,
   aes(
@@ -214,14 +206,17 @@ ggplot(
   )
 ) +
   geom_line() +
-  geom_point(size = 2) +
+  geom_point(
+    data = filter(figure1_extended, VCF0004 %% 4 == 0),
+    size = 2
+  ) +
   facet_grid(panel ~ ., scales = "fixed") +
   scale_y_continuous(
     limits = c(0, 0.5),
     breaks = seq(0.1, 0.5, 0.1)
   ) +
   scale_x_continuous(
-    breaks = seq(1956, 2024, 4)
+    breaks = seq(1952, 2024, 8)
   ) +
   scale_linetype_manual(
     values = c(
@@ -253,6 +248,119 @@ ggplot(
       color = "black",
       fill = NA
     ),
+    plot.title = element_text(hjust = 0.5)
+  )
+```
+
+
+## 4. Create figure that include midterm election years as well
+```{r}
+# Create figure including presidential and midterm election years
+
+# Create figure using the cumulative ANES data
+# through 2020, including presidential and midterm election years
+
+figure1_midterms <- anes_cum |>
+  filter(VCF0004 >= 1952 & VCF0004 <= 2020) |>
+  mutate(
+    party_id = case_when(
+      VCF0305 == 1 ~ "Pure Independents",
+      VCF0305 == 2 ~ "Independent Leaners",
+      VCF0305 == 3 ~ "Weak Identifiers",
+      VCF0305 == 4 ~ "Strong Identifiers",
+      TRUE ~ NA_character_
+    )
+  ) |>
+  filter(!is.na(party_id)) |>
+  group_by(VCF0004, party_id) |>
+  summarize(n = n(), .groups = "drop") |>
+  group_by(VCF0004) |>
+  mutate(proportion = n / sum(n)) |>
+  ungroup() |>
+  mutate(
+    panel = case_when(
+      party_id %in% c("Strong Identifiers", "Weak Identifiers") ~ "Identifiers",
+      party_id %in% c("Independent Leaners", "Pure Independents") ~ "Independents"
+    )
+  )
+
+# Plot
+ggplot(
+  figure1_midterms,
+  aes(
+    x = VCF0004,
+    y = proportion,
+    group = party_id,
+    linetype = party_id,
+    shape = party_id
+  )
+) +
+  
+  # Lines connect all available ANES years
+  geom_line() +
+  
+  # Points show all available ANES years, including midterms
+  geom_point(size = 2) +
+  
+  # Create two panels
+  facet_grid(
+    panel ~ .,
+    scales = "fixed"
+  ) +
+  
+  # Y-axis
+  scale_y_continuous(
+    limits = c(0, 0.5),
+    breaks = seq(0.1, 0.5, 0.1)
+  ) +
+  
+  # X-axis
+  scale_x_continuous(
+    breaks = seq(1952, 2020, 4)
+  ) +
+  
+  # Line types
+  scale_linetype_manual(
+    values = c(
+      "Strong Identifiers" = "solid",
+      "Weak Identifiers" = "dashed",
+      "Independent Leaners" = "dashed",
+      "Pure Independents" = "solid"
+    )
+  ) +
+  
+  # Point shapes
+  scale_shape_manual(
+    values = c(
+      "Strong Identifiers" = 16,
+      "Weak Identifiers" = 1,
+      "Independent Leaners" = 1,
+      "Pure Independents" = 16
+    )
+  ) +
+  
+  # Labels
+  labs(
+    x = NULL,
+    y = NULL,
+    title = "Proportions of National Election Study Sample"
+  ) +
+  
+  # Theme
+  theme_classic() +
+  
+  theme(
+    legend.position = "bottom",
+    strip.background = element_blank(),
+    strip.text = element_blank(),
+    
+    # Border around each panel
+    panel.border = element_rect(
+      color = "black",
+      fill = NA
+    ),
+    
+    # Center title
     plot.title = element_text(
       hjust = 0.5
     )
