@@ -502,7 +502,7 @@ republican_ideology <- anes_cum |>
     republican_ideology = case_when(
       VCF0504 %in% c(1, 2, 3) ~ "Liberal", 
       VCF0504 == 4 ~ "Moderate", 
-      VCF0504 %in% c(5, 6, 7) ~ 
+      VCF0504 %in% c(5, 6, 7) ~ "Conservative",
       TRUE ~ NA_character_ # Assign missing values to observations that do not match a category
     )
   ) |>
@@ -531,6 +531,7 @@ ggplot(republican_ideology, aes(x = republican_ideology)) +
     x = "Rating of Republican Party",
     y = "Number of Respondents" 
   ) +
-   # Apply classic theme
-  theme_classic() 
+  # Apply classic theme
+  theme_classic()
+
 
