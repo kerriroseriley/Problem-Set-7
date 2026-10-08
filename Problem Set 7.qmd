@@ -1,11 +1,10 @@
----
+--- 
 title: "Problem Set 7"
 author: "Kerri Rose Riley"
 format:
   html: default
   pdf: default
 ---
-
 ## 1. Replicate both parts of Figure 1 for Bartel
 ```{r}
 
